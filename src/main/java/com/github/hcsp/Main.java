@@ -42,7 +42,7 @@ public class Main {
                 Document document = httpGetAndParseHtmlDoc(link);
                 // 把该网页包含的其他链接加入待处理链接池
                 extractDocumentLinksToPoll(linkPoll, document);
-                // 判断，如果是一个新闻页面就存入数据库，否则什么也不做
+                // 判断，如果该网页是一个新闻页面就存入数据库，否则什么也不做
                 articleCount = storeNewsArticleTitleAndGetCount(articleCount, document);
                 // 把当前链接加入已处理链接池
                 processedLinksPoll.add(link);
