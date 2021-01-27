@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.hcsp</groupId>
-    <artifactId>xiedaimala-clawer</artifactId>
+    <artifactId>xiedaimala-crawler</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -52,6 +52,12 @@
         </profile>
     </profiles>
     <dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
