@@ -42,7 +42,7 @@ public class Main {
                 extractDocumentLinksToDatabase(document, connection);
                 // 判断，如果该网页是一个新闻页面就操作一下（打印url和标题），否则什么也不做
                 System.out.println(link);
-                System.out.println(getTitleAndInsertIntoDatabase(document));
+                getTitleAndInsertIntoDatabase(document);
                 // 把当前链接加入已处理链接池
                 UpdateTableInDatabase(connection, link, "INSERT INTO LINKS_ALREADY_PROCESSED VALUES (?)");
             }
