@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Main {
     @SuppressFBWarnings("DMI_CONSTANT_DB_PASSWORD")
@@ -43,7 +44,7 @@ public class Main {
                 extractOtherLinksInDoc(document, connection);
                 // 判断，如果该网页是一个新闻页面就操作一下（打印url和标题），否则什么也不做
                 System.out.println(link);
-                getTitleAndInsertIntoNewsDatabase(document);
+                getTitleAndInsertIntoNewsDatabase(document, connection, link);
                 // 把当前链接加入已处理链接池
                 UpdateTableInDatabase(connection, link, "INSERT INTO LINKS_ALREADY_PROCESSED VALUES (?)");
             }
@@ -104,20 +105,29 @@ public class Main {
      * 处理某一个选出来的新闻页面，目前是把新闻的文章标题和链接打印出来
      *
      * @param document 待处理的新闻页面
-     * @return 返回String，目前处理的新闻文章标题
      */
-    private static String getTitleAndInsertIntoNewsDatabase(Document document) {
+    private static void getTitleAndInsertIntoNewsDatabase(Document document, Connection connection, String link)
+            throws SQLException {
         // 有article的页面是新闻文章页
-        String title = null;
+        String title;
+        String content;
         ArrayList<Element> articleTags = document.select("article");
         if (!articleTags.isEmpty()) {
             for (Element articleTag : articleTags) {
                 // 选中文章标题
                 title = articleTag.child(0).text();
                 System.out.println(title);
+                content = articleTag.select("p").stream().map(Element::text).collect(Collectors.joining("\n"));
+
+                String sqlStatement = "INSERT INTO NEWS_RESULTS(title, url, content) VALUES(?, ?, ?)";
+                try (PreparedStatement statement = connection.prepareStatement(sqlStatement)) {
+                    statement.setString(1, title);
+                    statement.setString(2, link);
+                    statement.setString(3, content);
+                    statement.executeUpdate();
+                }
             }
         }
-        return title;
     }
 
     /**

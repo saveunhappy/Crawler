@@ -14,6 +14,6 @@ CREATE TABLE NEWS_RESULTS
     title     text,
     content   text,
     url       varchar(1000),
-    create_at timestamp,
-    update_at timestamp
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
