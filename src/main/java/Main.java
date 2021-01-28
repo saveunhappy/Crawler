@@ -1,3 +1,4 @@
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -17,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Main {
+    @SuppressFBWarnings("DMI_CONSTANT_DB_PASSWORD")
     public static void main(String[] args) throws IOException, SQLException {
         String jdbcUrl = "jdbc:h2:file:D:\\Project\\Crawler\\news";
         Connection connection = DriverManager.getConnection(jdbcUrl, "root", "root");
@@ -51,11 +53,16 @@ public class Main {
     }
 
     private static boolean isProcessedLink(Connection connection, String link) throws SQLException {
+        ResultSet resultSet = null;
         try (PreparedStatement statement = connection.prepareStatement("select * from LINKS_ALREADY_PROCESSED WHERE LINK = ?")) {
             statement.setString(1, link);
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return true;
+            }
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
             }
         }
         return false;
@@ -78,8 +85,7 @@ public class Main {
 
     private static String getUrlWaitsForProcessPoll(Connection connection) throws SQLException {
         String result;
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM LINKS_TO_BE_PROCESSED")) {
-            ResultSet resultSet = statement.executeQuery();
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM LINKS_TO_BE_PROCESSED"); ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
                 result = resultSet.getString(1);
             } else {
@@ -93,7 +99,7 @@ public class Main {
      * 处理某一个选出来的新闻页面，目前是把新闻的文章标题和链接打印出来
      *
      * @param document 待处理的新闻页面
-     * @return 返回articleCount，目前处理的新闻文章页面数
+     * @return 返回String，目前处理的新闻文章标题
      */
     private static String getTitleAndInsertIntoDatabase(Document document) {
         // 有article的页面是新闻文章页
