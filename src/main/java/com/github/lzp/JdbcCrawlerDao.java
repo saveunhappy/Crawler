@@ -1,13 +1,17 @@
 package com.github.lzp;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcCrawlerDao implements CrawlerDao{
+@SuppressFBWarnings("DMI_CONSTANT_DB_PASSWORD")
+public class JdbcCrawlerDao implements CrawlerDao {
     String jdbcUrl = "jdbc:h2:file:D:\\Project\\Crawler\\news";
+
     Connection connection = DriverManager.getConnection(jdbcUrl, "root", "root");
 
     public JdbcCrawlerDao() throws SQLException {
@@ -33,11 +37,11 @@ public class JdbcCrawlerDao implements CrawlerDao{
     /**
      * 传入一个带一个参数的sql语句
      *
-     * @param link 待处理链接
+     * @param link         待处理链接
      * @param sqlStatement 传入的sql语句
      * @throws SQLException 数据库操作导致的异常
      */
-    public void UpdateTableInDatabase(String link, String sqlStatement)
+    public void updateTableInDatabase(String link, String sqlStatement)
             throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sqlStatement)) {
             statement.setString(1, link);
@@ -53,7 +57,7 @@ public class JdbcCrawlerDao implements CrawlerDao{
             if (resultSet.next()) {
                 result = resultSet.getString(1);
                 // 从数据库中删除取出的链接
-                UpdateTableInDatabase(result, "DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?");
+                updateTableInDatabase(result, "DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?");
             } else {
                 result = "";
             }

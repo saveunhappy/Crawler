@@ -1,6 +1,5 @@
 package com.github.lzp;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -26,13 +25,12 @@ public class Crawler {
         new Crawler().run();
     }
 
-    @SuppressFBWarnings("DMI_CONSTANT_DB_PASSWORD")
     public void run() throws IOException, SQLException {
 
         // 需爬虫的主页
         String startPage = "http://sina.cn";
         // 将主页插入待处理链接数据库
-        dao.UpdateTableInDatabase(startPage, " INSERT INTO LINKS_TO_BE_PROCESSED VALUES (?)");
+        dao.updateTableInDatabase(startPage, " INSERT INTO LINKS_TO_BE_PROCESSED VALUES (?)");
 
         String link;
         while (!("".equals(link = dao.getNextUrlThenDelete()))) {
@@ -50,7 +48,7 @@ public class Crawler {
                 System.out.println(link);
                 getTitleAndInsertIntoNewsDatabase(document, link);
                 // 把当前链接加入已处理链接池
-                dao.UpdateTableInDatabase(link, "INSERT INTO LINKS_ALREADY_PROCESSED VALUES (?)");
+                dao.updateTableInDatabase(link, "INSERT INTO LINKS_ALREADY_PROCESSED VALUES (?)");
             }
         }
         System.out.println("已完成爬取!!!");
@@ -70,9 +68,9 @@ public class Crawler {
             if (refString.startsWith("//")) {
                 refString = "https:" + refString;
             }
-            if (!refString.startsWith("#") & !refString.startsWith("javascript")
+            if (!refString.startsWith("#") && !refString.startsWith("javascript")
                     && !refString.startsWith("javaScript") && !("".equals(refString))) {
-                dao.UpdateTableInDatabase(refString,
+                dao.updateTableInDatabase(refString,
                         "INSERT INTO LINKS_TO_BE_PROCESSED VALUES (?)");
             }
         }
