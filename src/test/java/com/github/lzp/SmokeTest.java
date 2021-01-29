@@ -1,3 +1,5 @@
+package com.github.lzp;
+
 import org.junit.jupiter.api.Test;
 
 public class SmokeTest {
