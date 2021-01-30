@@ -17,6 +17,7 @@ public class JdbcCrawlerDao implements CrawlerDao {
     public JdbcCrawlerDao() throws SQLException {
     }
 
+    @Override
     public boolean isProcessedLink(String link) throws SQLException {
         ResultSet resultSet = null;
         try (PreparedStatement statement =
@@ -35,14 +36,23 @@ public class JdbcCrawlerDao implements CrawlerDao {
     }
 
     /**
-     * 传入一个带一个参数的sql语句
+     * 将给定链接插入LINKS_TO_BE_PROCESSED表
      *
-     * @param link         待处理链接
-     * @param sqlStatement 传入的sql语句
+     * @param link 待处理链接
      * @throws SQLException 数据库操作导致的异常
      */
-    public void updateTableInDatabase(String link, String sqlStatement)
+    public void updateProcessedLinksTable(String link)
             throws SQLException {
+        String sqlStatement = "INSERT INTO LINKS_TO_BE_PROCESSED VALUES (?)";
+        try (PreparedStatement statement = connection.prepareStatement(sqlStatement)) {
+            statement.setString(1, link);
+            statement.executeUpdate();
+        }
+    }
+
+    @Override
+    public void updateLinksToBeProcessTable(String link) throws SQLException {
+        String sqlStatement = "INSERT INTO LINKS_ALREADY_PROCESSED VALUES (?)";
         try (PreparedStatement statement = connection.prepareStatement(sqlStatement)) {
             statement.setString(1, link);
             statement.executeUpdate();
@@ -50,19 +60,28 @@ public class JdbcCrawlerDao implements CrawlerDao {
     }
 
     public String getNextUrlThenDelete() throws SQLException {
-        String result;
+        String nextUrl;
         try (PreparedStatement statement =
                      connection.prepareStatement("SELECT * FROM LINKS_TO_BE_PROCESSED");
              ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {
-                result = resultSet.getString(1);
+                nextUrl = resultSet.getString(1);
                 // 从数据库中删除取出的链接
-                updateTableInDatabase(result, "DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?");
+                deleteLinksToBeProcessed(nextUrl);
             } else {
-                result = "";
+                nextUrl = "";
             }
         }
-        return result;
+        return nextUrl;
+    }
+
+    private void deleteLinksToBeProcessed(String nextUrl) throws SQLException {
+        String deleteSqlStatement = "DELETE FROM LINKS_TO_BE_PROCESSED WHERE LINK = ?";
+        try (PreparedStatement statement =
+                     connection.prepareStatement(deleteSqlStatement)) {
+            statement.setString(1, nextUrl);
+            statement.executeUpdate();
+        }
     }
 
 
