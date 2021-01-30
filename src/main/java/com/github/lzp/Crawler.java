@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class Crawler {
-    private final CrawlerDao dao = new JdbcCrawlerDao();
+    private final CrawlerDao dao = new MybatisCrawlerDao();
 
     public Crawler() throws SQLException {
     }
@@ -30,7 +30,7 @@ public class Crawler {
         // 需爬虫的主页
         String startPage = "http://sina.cn";
         // 将主页插入待处理链接数据库
-        dao.updateTableInDatabase(startPage, " INSERT INTO LINKS_TO_BE_PROCESSED VALUES (?)");
+        dao.updateLinksToBeProcessTable(startPage);
 
         String link;
         while (!("".equals(link = dao.getNextUrlThenDelete()))) {
@@ -48,7 +48,7 @@ public class Crawler {
                 System.out.println(link);
                 getTitleAndInsertIntoNewsDatabase(document, link);
                 // 把当前链接加入已处理链接池
-                dao.updateTableInDatabase(link, "INSERT INTO LINKS_ALREADY_PROCESSED VALUES (?)");
+                dao.updateProcessedLinksTable(link);
             }
         }
         System.out.println("已完成爬取!!!");
@@ -70,8 +70,7 @@ public class Crawler {
             }
             if (!refString.startsWith("#") && !refString.startsWith("javascript")
                     && !refString.startsWith("javaScript") && !("".equals(refString))) {
-                dao.updateTableInDatabase(refString,
-                        "INSERT INTO LINKS_TO_BE_PROCESSED VALUES (?)");
+                dao.updateLinksToBeProcessTable(refString);
             }
         }
     }
@@ -113,7 +112,8 @@ public class Crawler {
                 // 选中文章标题
                 title = articleTag.child(0).text();
                 System.out.println(title);
-                content = articleTag.select("p").stream().map(Element::text).collect(Collectors.joining("\n"));
+                content = articleTag.select("p").stream()
+                        .map(Element::text).collect(Collectors.joining("\n"));
                 dao.insertNewsIntoDatabase(link, title, content);
             }
         }
