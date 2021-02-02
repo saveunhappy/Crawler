@@ -50,7 +50,7 @@ public class MybatisCrawlerDao implements CrawlerDao {
     }
 
     @Override
-    public String getNextUrlThenDelete() {
+    public synchronized String getNextUrlThenDelete() {
         String url;
         try (SqlSession session = sqlSessionFactory.openSession(true)) {
             url = session.selectOne("com.github.lzp.MyMapper.selectNextLink", 101);

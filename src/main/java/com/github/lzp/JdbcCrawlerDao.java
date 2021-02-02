@@ -59,7 +59,7 @@ public class JdbcCrawlerDao implements CrawlerDao {
         }
     }
 
-    public String getNextUrlThenDelete() throws SQLException {
+    public synchronized String getNextUrlThenDelete() throws SQLException {
         String nextUrl;
         try (PreparedStatement statement =
                      connection.prepareStatement("SELECT * FROM LINKS_TO_BE_PROCESSED");

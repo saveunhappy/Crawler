@@ -1,3 +1,6 @@
+CREATE
+DATABASE IF NOT EXISTS news;
+
 CREATE TABLE news.LINKS_TO_BE_PROCESSED
 (
     link varchar(1000)
