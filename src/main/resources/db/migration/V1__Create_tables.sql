@@ -1,14 +1,14 @@
-CREATE TABLE LINKS_TO_BE_PROCESSED
+CREATE TABLE news.LINKS_TO_BE_PROCESSED
 (
     link varchar(1000)
 );
 
-CREATE TABLE LINKS_ALREADY_PROCESSED
+CREATE TABLE news.LINKS_ALREADY_PROCESSED
 (
     link varchar(1000)
 );
 
-CREATE TABLE NEWS_RESULTS
+CREATE TABLE news.NEWS_RESULTS
 (
     id         bigint primary key auto_increment,
     title      text,
