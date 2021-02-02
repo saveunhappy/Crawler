@@ -15,41 +15,40 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class Crawler {
-    private final CrawlerDao dao = new MybatisCrawlerDao();
+public class Crawler extends Thread {
+    private final CrawlerDao dao;
 
-    public Crawler() throws SQLException {
+    public Crawler(CrawlerDao dao) {
+        this.dao = dao;
     }
 
-    public static void main(String[] args) throws IOException, SQLException {
-        new Crawler().run();
-    }
-
-    public void run() throws IOException, SQLException {
-
+    @Override
+    public void run() {
         // 需爬虫的主页
         String startPage = "http://sina.cn";
         // 将主页插入待处理链接数据库
-        dao.updateLinksToBeProcessTable(startPage);
-
-        String link;
-        while (!("".equals(link = dao.getNextUrlThenDelete()))) {
-            // 查询当前连接是否为已经被处理过的链接，是就跳过处理下一条
-            if (dao.isProcessedLink(link)) {
-                continue;
+        try {
+            String link;
+            while (!("".equals(link = dao.getNextUrlThenDelete()))) {
+                // 查询当前连接是否为已经被处理过的链接，是就跳过处理下一条
+                if (dao.isProcessedLink(link)) {
+                    continue;
+                }
+                // 是新闻页面/sina首页/不是新闻页面跳转的登陆页面，那么处理
+                if (isInterestedLink(link, startPage)) {
+                    // 遍历网页
+                    Document document = httpGetAndParseHtml(link);
+                    // 把该网页包含的其他链接加入待处理链接池
+                    extractLinksInDocAndSaveIntoDB(document);
+                    // 判断，如果该网页是一个新闻页面就操作一下（打印url和标题），否则什么也不做
+                    System.out.println(link);
+                    getTitleAndInsertIntoNewsDatabase(document, link);
+                    // 把当前链接加入已处理链接池
+                    dao.updateProcessedLinksTable(link);
+                }
             }
-            // 是新闻页面/sina首页/不是新闻页面跳转的登陆页面，那么处理
-            if (isInterestedLink(link, startPage)) {
-                // 遍历网页
-                Document document = httpGetAndParseHtml(link);
-                // 把该网页包含的其他链接加入待处理链接池
-                extractOtherLinksInDoc(document);
-                // 判断，如果该网页是一个新闻页面就操作一下（打印url和标题），否则什么也不做
-                System.out.println(link);
-                getTitleAndInsertIntoNewsDatabase(document, link);
-                // 把当前链接加入已处理链接池
-                dao.updateProcessedLinksTable(link);
-            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         System.out.println("已完成爬取!!!");
     }
@@ -60,7 +59,7 @@ public class Crawler {
      *
      * @param document 需要抽取链接的网页，Document格式
      */
-    private void extractOtherLinksInDoc(Document document)
+    private void extractLinksInDocAndSaveIntoDB(Document document)
             throws SQLException {
         ArrayList<Element> links = document.select("a");
         for (Element aTag : links) {
