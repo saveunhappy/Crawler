@@ -28,8 +28,6 @@ public class Crawler extends Thread {
         String startPage = "http://sina.cn";
         // 将主页插入待处理链接数据库
         try {
-            dao.updateLinksToBeProcessTable(startPage);
-
             String link;
             while (!("".equals(link = dao.getNextUrlThenDelete()))) {
                 // 查询当前连接是否为已经被处理过的链接，是就跳过处理下一条
@@ -41,7 +39,7 @@ public class Crawler extends Thread {
                     // 遍历网页
                     Document document = httpGetAndParseHtml(link);
                     // 把该网页包含的其他链接加入待处理链接池
-                    extractOtherLinksInDoc(document);
+                    extractLinksInDocAndSaveIntoDB(document);
                     // 判断，如果该网页是一个新闻页面就操作一下（打印url和标题），否则什么也不做
                     System.out.println(link);
                     getTitleAndInsertIntoNewsDatabase(document, link);
@@ -61,7 +59,7 @@ public class Crawler extends Thread {
      *
      * @param document 需要抽取链接的网页，Document格式
      */
-    private void extractOtherLinksInDoc(Document document)
+    private void extractLinksInDocAndSaveIntoDB(Document document)
             throws SQLException {
         ArrayList<Element> links = document.select("a");
         for (Element aTag : links) {
