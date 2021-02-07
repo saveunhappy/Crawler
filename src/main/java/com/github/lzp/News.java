@@ -1,22 +1,42 @@
 package com.github.lzp;
 
+import java.time.Instant;
+
 public class News {
-    String link;
+    String url;
     String title;
     String content;
+    Instant createdAt;
+    Instant updatedAt;
 
-    public News(String link, String title, String content) {
-        this.link = link;
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public News(String url, String title, String content) {
+        this.url = url;
         this.title = title;
         this.content = content;
     }
 
-    public String getLink() {
-        return link;
+    public String getUrl() {
+        return url;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getTitle() {
