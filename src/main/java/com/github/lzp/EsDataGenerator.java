@@ -25,7 +25,7 @@ public class EsDataGenerator implements DataGenerator {
         sqlSessionFactory = DataGenerator.getSqlSessionFactory();
 
         try (SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH)) {
-            newsFromMySql = getNewsListFromMySql(sqlSession, 2000);
+            newsFromMySql = DataGenerator.getNewsListFromMySql(sqlSession);
         }
 
         try (RestHighLevelClient client = new RestHighLevelClient(
@@ -33,26 +33,24 @@ public class EsDataGenerator implements DataGenerator {
         ) {
 
             for (News news : newsFromMySql) {
-                IndexRequest request = new IndexRequest("news").id("id");
-                Map<String, Object> newsToInsert = new HashMap<>();
-                newsToInsert.put("content", news.getContent());
-                newsToInsert.put("title", news.getTitle());
-                newsToInsert.put("url", news.getUrl());
-                newsToInsert.put("createdAt", news.getCreatedAt());
-                newsToInsert.put("updatedAt", news.getUpdatedAt());
-
-
-                request.source(newsToInsert, XContentType.JSON);
-
-                IndexResponse response = client.index(request, RequestOptions.DEFAULT);
-                System.out.println(response.status().getStatus());
+                updateNewsToEs(client, news);
             }
         }
     }
 
-    static List<News> getNewsListFromMySql(SqlSession sqlSession, int rowBoundary) {
-        List<News> currentNews = sqlSession.selectList("com.github.lzp.MockMapper.selectNews", rowBoundary);
-        System.out.println(currentNews.size());
-        return currentNews;
+    private static void updateNewsToEs(RestHighLevelClient client, News news) throws IOException {
+        IndexRequest request = new IndexRequest("news");
+        Map<String, Object> newsToInsert = new HashMap<>();
+        newsToInsert.put("content", news.getContent());
+        newsToInsert.put("title", news.getTitle());
+        newsToInsert.put("url", news.getUrl());
+        newsToInsert.put("createdAt", news.getCreatedAt());
+        newsToInsert.put("updatedAt", news.getUpdatedAt());
+
+
+        request.source(newsToInsert, XContentType.JSON);
+
+        IndexResponse response = client.index(request, RequestOptions.DEFAULT);
+        System.out.println(response.status().getStatus());
     }
 }

@@ -18,7 +18,7 @@ public class MockDataGenerator implements DataGenerator {
         sqlSessionFactory = DataGenerator.getSqlSessionFactory();
 
         try (SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH)) {
-            currentNews = DataGenerator.getNewsListFromMySql(sqlSession);
+            currentNews = DataGenerator.getNewsListFromMySql(sqlSession, 2000);
             int count = TARGET_ROW_COUNT - currentNews.size();
             mockNewsData(currentNews, sqlSession, count);
         }

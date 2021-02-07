@@ -10,6 +10,12 @@ import java.io.InputStream;
 import java.util.List;
 
 public interface DataGenerator {
+    static List<News> getNewsListFromMySql(SqlSession sqlSession, int rowBoundary) {
+        List<News> currentNews = sqlSession.selectList("com.github.lzp.MockMapper.selectNews", rowBoundary);
+        System.out.println(currentNews.size());
+        return currentNews;
+    }
+
     static List<News> getNewsListFromMySql(SqlSession sqlSession) {
         List<News> currentNews = sqlSession.selectList("com.github.lzp.MockMapper.selectNews");
         System.out.println(currentNews.size());
