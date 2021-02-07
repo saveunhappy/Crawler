@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.lzp.MyMapper">
     <select id="selectNextLink" resultType="String">
-        SELECT link
+        SELECT LINK
         FROM LINKS_TO_BE_PROCESSED
         limit 1
     </select>
@@ -17,8 +17,8 @@
     </delete>
     <insert id="insertNews"
             parameterType="com.github.lzp.News">
-        INSERT INTO NEWS_RESULTS(title, url, content)
-        VALUES (#{title}, #{link}, #{content})
+        INSERT INTO NEWS_RESULTS(TITLE, URL, CONTENT)
+        VALUES (#{title}, #{url}, #{content})
     </insert>
     <select id="isProcessedLink"
             parameterType="String"
