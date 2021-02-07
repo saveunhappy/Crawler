@@ -20,11 +20,11 @@ public class MockDataGenerator implements DataGenerator {
         try (SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH)) {
             currentNews = DataGenerator.getNewsListFromMySql(sqlSession, 2000);
             int count = TARGET_ROW_COUNT - currentNews.size();
-            mockNewsData(currentNews, sqlSession, count);
+            mockNewsDataAndInsertIntoDB(currentNews, sqlSession, count);
         }
     }
 
-    private static void mockNewsData(List<News> currentNews, SqlSession sqlSession, int count) {
+    private static void mockNewsDataAndInsertIntoDB(List<News> currentNews, SqlSession sqlSession, int count) {
         Random random = new Random();
         try {
             while (count-- > 0) {
