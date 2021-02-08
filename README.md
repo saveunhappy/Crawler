@@ -1,4 +1,6 @@
 # 多线程爬虫和ElasticSearch搜索引擎
+[![CircleCI](https://circleci.com/gh/pccmast/Crawler.svg?style=shield) ](https://circleci.com/gh/pccmast/Crawler)
+![license](https://img.shields.io/github/license/pccmast/Crawler?style=flat-square)
 
 这是一个简单的爬虫项目,
 他从 [新浪手机端首页](http://sina.cn) 爬取新闻标题,
@@ -8,8 +10,8 @@
 
 ## Requirements
 - Docker : 20.10.2
-- ElasticSearch : 7.10.1(通过docker安装)
-- MySql : 5.7.33(通过docker安装)
+- ElasticSearch : 7.10.1 (通过docker安装)
+- MySql : 5.7.33 (通过docker安装)
 - Maven : 3.6.3
 
 ## 部署步骤
@@ -77,12 +79,12 @@ News.java               爬取项目存储的对象--新闻类
 ```
 
 ## 使用
-1. 运行`Main.java`爬取网络数据, 默认会把数据存入mysql数据库中(使用 JDBC 存入 h2 数据库) 
+1. 运行`Main.java`爬取网络数据, 默认会把数据存入 mysql 数据库中(使用 JDBC 存入 h2 数据库) 
 
 2. 运行`MockDataGenerator.java`, 从mysql数据库中读取数据, 增加假数据以后把取得的数据放回 mysql 数据库。**(基于1)**
 
 3. 运行`EsDataGenerator.java`, 从mysql数据库中读取数据, 增加假数据以后把取得的数据放入 elasticsearch 搜索引擎中。**(基于1)**
 
-4. 运行`DataSearchEngine.java`, 在输入框输入想查询的文本，返回得到查询结果。**(基于3)**
+4. 运行`DataSearchEngine.java`, 在输入框输入想查询的文本, 返回得到查询结果。**(基于3)**
 
-5. 在浏览器输入`http://localhost:9200/`, 查看elasticsearch相关信息。**(基于3)**
+5. 在浏览器输入`http://localhost:9200/`, 查看elasticsearch相关信息。比如, `http://localhost:9200/_count` 、`http://localhost:9200/_search?q=title:美国` **(基于3)**
