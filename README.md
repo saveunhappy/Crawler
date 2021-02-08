@@ -3,7 +3,7 @@
 ![license](https://img.shields.io/github/license/pccmast/Crawler?style=flat-square)
 
 这是一个简单的爬虫项目,
-他从 [新浪手机端首页](http://sina.cn) 爬取新闻标题,
+它从 [新浪手机端首页](http://sina.cn) 爬取新闻标题,
 存储于 MySql 数据库中,
 最终导入 ElasticSearch 搜索引擎, 来实现关于爬取新闻内容的
 全文搜索功能。
@@ -20,7 +20,12 @@
 ```bash
 docker run -d -v resource/esdata:/usr/share/elasticsearch/data --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.10.1
 
-docker run --name mysql-for-crawler -e MYSQL_ROOT_PASSWORD=* -p 3306:3306 -v resources/db/data:/var/lib/mysql -d mysql:5.7.33
+docker run --name mysql-for-crawler -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -v resources/db/data:/var/lib/mysql -d mysql:5.7.33
+```
+3. 使用 flyway 创建数据库中的表。
+```markdown
+mvn flyway:clean
+mvn flyway:migrate
 ```
 
 ## 目录结构描述
