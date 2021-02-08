@@ -75,3 +75,14 @@ Crawler.java            爬虫线程的实现类
 DataSearchEngine.java   在控制台输入, 搜索elasticsearch上的项目并返回结果
 News.java               爬取项目存储的对象--新闻类
 ```
+
+## 使用
+1. 运行`Main.java`爬取网络数据, 默认会把数据存入mysql数据库中(使用 JDBC 存入 h2 数据库) 
+
+2. 运行`MockDataGenerator.java`, 从mysql数据库中读取数据, 增加假数据以后把取得的数据放回 mysql 数据库。**(基于1)**
+
+3. 运行`EsDataGenerator.java`, 从mysql数据库中读取数据, 增加假数据以后把取得的数据放入 elasticsearch 搜索引擎中。**(基于1)**
+
+4. 运行`DataSearchEngine.java`, 在输入框输入想查询的文本，返回得到查询结果。**(基于3)**
+
+5. 在浏览器输入`http://localhost:9200/`, 查看elasticsearch相关信息。**(基于3)**
