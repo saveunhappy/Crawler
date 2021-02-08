@@ -1,13 +1,13 @@
-# 基于ElasticSearch的多线程爬虫
+# 多线程爬虫和ElasticSearch搜索引擎
 
-## Feature
-这是一个简单的爬虫项目,他从
-[新浪手机端首页](http://sina.cn)爬取新闻标题,
-存储于 mysql 数据库中,
-最终导入 ElasticSearch 搜索引擎，来实现关于新闻内容的
+这是一个简单的爬虫项目,
+他从 [新浪手机端首页](http://sina.cn) 爬取新闻标题,
+存储于 MySql 数据库中,
+最终导入 ElasticSearch 搜索引擎, 来实现关于爬取新闻内容的
 全文搜索功能。
 
 ## Requirements
+- Docker : 20.10.2
 - ElasticSearch : 7.10.1(通过docker安装)
 - MySql : 5.7.33(通过docker安装)
 - Maven : 3.6.3
@@ -58,4 +58,20 @@ docker run --name mysql-for-crawler -e MYSQL_ROOT_PASSWORD=* -p 3306:3306 -v res
                └─github
                    └─lzp
                         SmokeTest.java
+```
+
+其中，位于 com.github.lzp 的文件：
+```markdown
+CrawlerDao.java         持久层接口，负责与数据库联络的方法
+JdbcCrawlerDao.java     使用了JDBC的持久层接口实现类
+MybatisCrawlerDao.java  使用了mybatis的持久层接口实现类
+
+DataGenerator.java      数据生成接口,其中有两个实现类的公有方法
+MockDataGenerator.java  根据爬取的新闻数据生成假数据, 并插入mysql数据库
+EsDataGenerator.java    根据爬取的新闻数据生成假数据, 并插入elasticsearch搜索引擎
+
+Main.java               多线程爬取网络链接的主文件
+Crawler.java            爬虫线程的实现类
+DataSearchEngine.java   在控制台输入, 搜索elasticsearch上的项目并返回结果
+News.java               爬取项目存储的对象--新闻类
 ```
