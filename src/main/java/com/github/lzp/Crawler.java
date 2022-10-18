@@ -6,6 +6,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.ibatis.session.SqlSession;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,8 +30,17 @@ public class Crawler extends Thread {
         // 将主页插入待处理链接数据库
         try {
             String link;
-            while (!("".equals(link = dao.getNextUrlThenDelete()))) {
+            /*这个返回的就是最初插入数据库的那一条*/
+            while ((link = dao.getNextUrlThenDelete())!= null) {
                 // 查询当前连接是否为已经被处理过的链接，是就跳过处理下一条
+            /*
+            *           SELECT COUNT(*)
+                        FROM LINKS_ALREADY_PROCESSED
+                        WHERE LINK = #{link}
+                        查询是否已经添加过了，如果添加过了，那么就直接跳过
+                        int result = session.selectOne("com.github.lzp.MyMapper.isProcessedLink", link);
+                        return result != 0;
+            */
                 if (dao.isProcessedLink(link)) {
                     continue;
                 }
@@ -69,6 +79,7 @@ public class Crawler extends Thread {
             }
             if (!refString.startsWith("#") && !refString.startsWith("javascript")
                     && !refString.startsWith("javaScript") && !("".equals(refString))) {
+                //放到将要处理的那张表中
                 dao.updateLinksToBeProcessTable(refString);
             }
         }
@@ -82,6 +93,7 @@ public class Crawler extends Thread {
      * @throws IOException execute()、toString()函数引起的
      */
     private static Document httpGetAndParseHtml(String link) throws IOException {
+        //就是一个可以自动关闭的HttpClient
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(link);
         httpGet.addHeader("User-Agent",

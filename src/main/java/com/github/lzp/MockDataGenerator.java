@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MockDataGenerator implements DataGenerator {
-    private static final int TARGET_ROW_COUNT = 500_000;
+    private static final int TARGET_ROW_COUNT = 500_0;
 
     public static void main(String[] args) {
         SqlSessionFactory sqlSessionFactory;
@@ -17,8 +17,9 @@ public class MockDataGenerator implements DataGenerator {
 
         sqlSessionFactory = DataGenerator.getSqlSessionFactory();
 
-        try (SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH)) {
-            currentNews = DataGenerator.getNewsListFromMySql(sqlSession, 2000);
+        try (SqlSession sqlSession = sqlSessionFactory.openSession(true)) {
+//            currentNews = DataGenerator.getNewsListFromMySql(sqlSession, 2000);
+            currentNews = DataGenerator.getNewsListFromMySql(sqlSession);
             int count = TARGET_ROW_COUNT - currentNews.size();
             mockNewsDataAndInsertIntoDB(currentNews, sqlSession, count);
         }
@@ -31,10 +32,11 @@ public class MockDataGenerator implements DataGenerator {
                 News newsToBeInserted = getMockNewsToBeInserted(currentNews, random);
                 sqlSession.insert("com.github.lzp.MockMapper.insertNews", newsToBeInserted);
                 System.out.println("Left:" + count);
+                if (count % 2000 == 0) {
+                    sqlSession.flushStatements();
+                }
             }
-            if (count % 2000 == 0) {
-                sqlSession.flushStatements();
-            }
+
             sqlSession.commit();
         } catch (Exception e) {
             sqlSession.rollback();

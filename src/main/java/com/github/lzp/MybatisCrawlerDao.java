@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
-public class MybatisCrawlerDao implements CrawlerDao {
+public class  MybatisCrawlerDao implements CrawlerDao {
     private SqlSessionFactory sqlSessionFactory;
 
     public MybatisCrawlerDao() {
@@ -25,6 +25,11 @@ public class MybatisCrawlerDao implements CrawlerDao {
     @Override
     public boolean isProcessedLink(String link) {
         try (SqlSession session = sqlSessionFactory.openSession()) {
+            /*
+            *           SELECT COUNT(*)
+                        FROM LINKS_ALREADY_PROCESSED
+                        WHERE LINK = #{link}
+            */
             int result = session.selectOne("com.github.lzp.MyMapper.isProcessedLink", link);
             return result != 0;
         }
@@ -50,10 +55,17 @@ public class MybatisCrawlerDao implements CrawlerDao {
     }
 
     @Override
-    public synchronized String getNextUrlThenDelete() {
+    public String getNextUrlThenDelete() {
         String url;
         try (SqlSession session = sqlSessionFactory.openSession(true)) {
+            //        SELECT LINK
+            //        FROM LINKS_TO_BE_PROCESSED
+            //        limit 1
+            //这个参数没屌用，里面根本就没有接收
             url = session.selectOne("com.github.lzp.MyMapper.selectNextLink", 101);
+            //        DELETE
+            //        FROM LINKS_TO_BE_PROCESSED
+            //        WHERE LINK = #{link}
             session.delete("com.github.lzp.MyMapper.deleteUrl", url);
         }
         return url;
