@@ -1,14 +1,17 @@
-CREATE TABLE news.LINKS_TO_BE_PROCESSED
+drop table if exists `LINKS_TO_BE_PROCESSED`;
+CREATE TABLE `LINKS_TO_BE_PROCESSED`
 (
     link varchar(1000)
 );
+drop table if exists `LINKS_ALREADY_PROCESSED`;
 
-CREATE TABLE news.LINKS_ALREADY_PROCESSED
+CREATE TABLE `LINKS_ALREADY_PROCESSED`
 (
     link varchar(1000)
 );
+drop table if exists `NEWS_RESULTS`;
 
-CREATE TABLE news.NEWS_RESULTS
+CREATE TABLE `NEWS_RESULTS`
 (
     id         bigint primary key auto_increment,
     title      text,
@@ -18,4 +21,4 @@ CREATE TABLE news.NEWS_RESULTS
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO news.LINKS_TO_BE_PROCESSED VALUES ('http://sina.cn');
+INSERT INTO LINKS_TO_BE_PROCESSED VALUES ('http://sina.cn');
